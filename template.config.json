@@ -1,0 +1,25 @@
+{
+  "project_name": "APEX-PROJECT-TEMPLATE",
+  "client_name": "Strategic Minds Advisory",
+  "vercel_project_id": "prj_example_12345",
+  "supabase_ref": "xyza-supabase-ref",
+  "drive_folder_id": "folder_example_67890",
+  "github_repo": "Strategic-Minds/APEX-PROJECT-TEMPLATE",
+  "browserworker_url": "https://browserworker.strategic-minds.ai/screenshot",
+  "design_system": {
+    "sidebar_color": "#000000",
+    "accent_color": "#f8b800",
+    "background_color": "#f0f0f0",
+    "font": "Inter"
+  },
+  "routes": [
+    {
+      "path": "/",
+      "description": "Auto redirect to Dashboard"
+    },
+    {
+      "path": "/dashboard",
+      "description": "Strategic advisory performance and KPIs panel"
+    }
+  ]
+}
