@@ -1,0 +1,146 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "APEX Build Pipeline",
+    "description": "Sends brand approval from ChatGPT to APEX to trigger the full autonomous build pipeline: Drive \u2192 GitHub \u2192 Vercel \u2192 Supabase \u2192 email when done.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://superagent-5dd22ea4.base44.app"
+    }
+  ],
+  "paths": {
+    "/functions/projectApproved": {
+      "post": {
+        "operationId": "approveProjectAndBuild",
+        "summary": "Approve brand/web pack and trigger full autonomous build",
+        "description": "Call this after Jeremy approves the brand and web pack. APEX will handle everything: Drive folder, GitHub repo, Vercel project, Supabase, build, BrowserWorker validation, and email when live.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "project",
+                  "payload"
+                ],
+                "properties": {
+                  "project": {
+                    "type": "string",
+                    "description": "Project name exactly as Jeremy approved it"
+                  },
+                  "payload": {
+                    "type": "object",
+                    "required": [
+                      "approved_by",
+                      "template_id",
+                      "notify_email",
+                      "brand"
+                    ],
+                    "properties": {
+                      "approved_by": {
+                        "type": "string",
+                        "default": "jeremy"
+                      },
+                      "template_id": {
+                        "type": "string",
+                        "enum": [
+                          "tmpl-epoxy-estimator",
+                          "tmpl-city-epoxy-site",
+                          "tmpl-consulting-dashboard",
+                          "tmpl-contractor-app"
+                        ],
+                        "description": "Template to use for the build"
+                      },
+                      "notify_email": {
+                        "type": "string",
+                        "default": "strategicmindsadvisory@gmail.com"
+                      },
+                      "brand": {
+                        "type": "object",
+                        "properties": {
+                          "primary_color": {
+                            "type": "string",
+                            "description": "Hex color, e.g. #000000"
+                          },
+                          "accent_color": {
+                            "type": "string",
+                            "default": "#f8b800"
+                          },
+                          "font_heading": {
+                            "type": "string",
+                            "default": "Inter"
+                          },
+                          "logo_description": {
+                            "type": "string"
+                          },
+                          "tagline": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "web_pack": {
+                        "type": "object",
+                        "properties": {
+                          "hero_headline": {
+                            "type": "string"
+                          },
+                          "hero_sub": {
+                            "type": "string"
+                          },
+                          "cta_text": {
+                            "type": "string"
+                          },
+                          "features": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Pipeline started successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "mission_id": {
+                      "type": "string"
+                    },
+                    "expected_url": {
+                      "type": "string"
+                    },
+                    "estimated_completion": {
+                      "type": "string"
+                    },
+                    "notify_email": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
