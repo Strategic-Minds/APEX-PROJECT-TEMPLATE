@@ -1,25 +1,56 @@
 {
-  "project_name": "APEX-PROJECT-TEMPLATE",
-  "client_name": "Strategic Minds Advisory",
-  "vercel_project_id": "prj_example_12345",
-  "supabase_ref": "xyza-supabase-ref",
-  "drive_folder_id": "folder_example_67890",
-  "github_repo": "Strategic-Minds/APEX-PROJECT-TEMPLATE",
-  "browserworker_url": "https://browserworker.strategic-minds.ai/screenshot",
+  "apex_template_version": "1.0.0",
+  "project_name": "{{PROJECT_NAME}}",
+  "client_name": "{{CLIENT_NAME}}",
+  "revenue_channel": "{{REVENUE_CHANNEL}}",
+  "dollar_impact": "{{DOLLAR_IMPACT}}",
+  "template_id": "{{TEMPLATE_ID}}",
+  "infrastructure": {
+    "github_org": "Strategic-Minds",
+    "github_repo": "{{REPO_NAME}}",
+    "vercel_team": "team_aFdds8lsbHMwe2ip4aQdbQ3d",
+    "vercel_project_id": "{{VERCEL_PROJECT_ID}}",
+    "vercel_url": "{{VERCEL_URL}}",
+    "supabase_ref": "prhppuuwcnmfdhwsagug",
+    "supabase_url": "https://prhppuuwcnmfdhwsagug.supabase.co",
+    "drive_folder_id": "{{DRIVE_FOLDER_ID}}",
+    "drive_projects_root": "1WWqV5ejMsdH0sa7-cHlyDBeXOqU0Z_Nr",
+    "browserworker_url": "https://browserworker-j4homeh5w-strategic-minds-advisory.vercel.app",
+    "chatgpt_bridge_url": "https://xtreme-ai-bridge.vercel.app",
+    "uacs_url": "https://universal-autonomous-coding-system-dlma2kyqn.vercel.app"
+  },
   "design_system": {
     "sidebar_color": "#000000",
+    "sidebar_width": "240px",
     "accent_color": "#f8b800",
-    "background_color": "#f0f0f0",
-    "font": "Inter"
+    "background": "#f0f0f0",
+    "content_bg": "#ffffff",
+    "font_family": "Inter",
+    "min_body_font": "17px",
+    "heading_weight": "700-900"
   },
-  "routes": [
-    {
-      "path": "/",
-      "description": "Auto redirect to Dashboard"
-    },
-    {
-      "path": "/dashboard",
-      "description": "Strategic advisory performance and KPIs panel"
-    }
-  ]
+  "routes": "{{ROUTES_ARRAY}}",
+  "pipeline_phases": [
+    "idea",
+    "spec",
+    "brand",
+    "build",
+    "validate",
+    "deploy",
+    "live"
+  ],
+  "faang_gate": 90,
+  "agents": {
+    "orchestrator": "apex",
+    "visual_director": "chatgpt",
+    "qa_validator": "browserworker"
+  },
+  "sync": {
+    "drive_subfolder": "09-SYNC-STATE",
+    "sync_file": "SYNC_STATE.json",
+    "github_sync_file": "sync/last-sync.json",
+    "supabase_table": "apex_sync_state",
+    "base44_memory": "memory.md",
+    "chatgpt_memory": "docs/CHATGPT_BOOT_SEQUENCE.md"
+  }
 }
