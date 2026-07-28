@@ -1,0 +1,33 @@
+name: BrowserWorker Validate
+
+on:
+  deployment_status:
+
+jobs:
+  visual-validation:
+    name: Visual Validation and Screenshot Capture
+    if: github.event.deployment_status.state == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Automated BrowserWorker Verification
+        env:
+          BROWSERWORKER_SECRET: ${{ secrets.BROWSERWORKER_SECRET }}
+          BROWSERWORKER_URL: ${{ secrets.BROWSERWORKER_URL }}
+          DEPLOYMENT_URL: ${{ github.event.deployment_status.target_url }}
+        run: |
+          if [ -z "$BROWSERWORKER_SECRET" ] || [ -z "$BROWSERWORKER_URL" ]; then
+            echo "::warning::BrowserWorker credentials missing (BROWSERWORKER_SECRET/BROWSERWORKER_URL). Skipping visual validation."
+            exit 0
+          fi
+          
+          echo "Triggering visual validation at URL: $DEPLOYMENT_URL"
+          RESPONSE=$(curl -s -w "%{http_code}" -o response.json             -X POST "$BROWSERWORKER_URL"             -H "Authorization: Bearer $BROWSERWORKER_SECRET"             -H "Content-Type: application/json"             -d "{\"url\": \"$DEPLOYMENT_URL\", \"capture\": \"fullpage\"}")
+            
+          if [ "$RESPONSE" -ge 200 ] && [ "$RESPONSE" -lt 300 ]; then
+            echo "BrowserWorker trigger succeeded!"
+            cat response.json
+          else
+            echo "::error::BrowserWorker validation trigger failed with response code $RESPONSE"
+            cat response.json || true
+            exit 1
+          fi
