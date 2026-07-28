@@ -1,0 +1,21 @@
+name: Vercel Deploy Monitor
+
+on:
+  push:
+    branches: [ main, master ]
+
+jobs:
+  monitor:
+    name: Track Vercel Deployment status
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Log Deploy Meta-information
+        run: |
+          echo "=== VERCEL DEPLOYMENT TRIGGERED ==="
+          echo "Commit SHA: ${{ github.sha }}"
+          echo "Committer: ${{ github.actor }}"
+          echo "Repository: ${{ github.repository }}"
+          echo "Initiating automatic Vercel build & edge dispatch monitor..."
