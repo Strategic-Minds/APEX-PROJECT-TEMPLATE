@@ -1,0 +1,58 @@
+name: New Project Init
+on:
+  workflow_dispatch:
+    inputs:
+      project_name:
+        description: 'Project name (e.g. "Phoenix Epoxy Denver")'
+        required: true
+      revenue_channel:
+        description: 'Revenue channel'
+        required: true
+        default: 'epoxy'
+        type: choice
+        options: [consulting, epoxy, training, xps, internal]
+      template_id:
+        description: 'Template ID'
+        required: true
+        default: 'tmpl-epoxy-estimator'
+        type: choice
+        options: [tmpl-epoxy-estimator, tmpl-city-epoxy-site, tmpl-consulting-dashboard, tmpl-contractor-app]
+
+jobs:
+  init-project:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Run APEX project init
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          GOOGLEDRIVE_ACCESS_TOKEN: ${{ secrets.GOOGLEDRIVE_ACCESS_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN || github.token }}
+        run: |
+          chmod +x scripts/init-project.sh
+          ./scripts/init-project.sh "${{ inputs.project_name }}" "${{ inputs.revenue_channel }}" "${{ inputs.template_id }}"
+          
+      - name: Generate memory files
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          pip install requests -q
+          python3 scripts/generate-memory.py "${{ inputs.project_name }}" || echo "Memory gen skipped"
+          
+      - name: Upload memory files to Drive
+        continue-on-error: true
+        env:
+          GOOGLEDRIVE_ACCESS_TOKEN: ${{ secrets.GOOGLEDRIVE_ACCESS_TOKEN }}
+        run: |
+          echo "Memory files would be uploaded to Drive 02-BRAND-CHATGPT folder here"
+          ls -la *_MEMORY.md 2>/dev/null || echo "No memory files generated"
+          
+      - name: Summary
+        run: |
+          echo "=== PROJECT INIT COMPLETE ==="
+          echo "Project: ${{ inputs.project_name }}"
+          echo "Channel: ${{ inputs.revenue_channel }}"
+          echo "Template: ${{ inputs.template_id }}"
+          echo "Next: Add approved mockups to Drive 01-SPECS, then submit to UACS queue"
