@@ -1,0 +1,33 @@
+name: Supabase Check
+
+on:
+  push:
+    branches: [ main, master ]
+    paths:
+      - 'supabase/**'
+
+jobs:
+  verify-migrations:
+    name: Supabase Migration Quality Assurance
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Check Migration Integrity
+        run: |
+          echo "Verifying migration directory safety..."
+          if [ ! -d "supabase/migrations" ]; then
+            echo "::error::supabase/migrations directory is missing!"
+            exit 1
+          fi
+          
+          # Count valid migration files (ignoring hidden files / gitkeep)
+          MIGRATION_FILES=$(find supabase/migrations -type f -not -name '.*' | wc -l)
+          echo "Total migrations found: $MIGRATION_FILES"
+          
+          # Basic syntax/structure checks on seed file if present
+          if [ -f "supabase/seed.sql" ]; then
+            echo "Checking seed.sql for syntax sanity..."
+            grep -qi "insert into" supabase/seed.sql || echo "::warning::seed.sql does not appear to contain INSERT statements."
+          fi
