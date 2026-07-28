@@ -1,0 +1,86 @@
+{
+  "name": "{{PROJECT_SLUG}}",
+  "framework": "nextjs",
+  "installCommand": "npm install --legacy-peer-deps",
+  "buildCommand": "next build",
+  "outputDirectory": ".next",
+  "environmentVariables": [
+    {
+      "key": "NEXT_PUBLIC_SUPABASE_URL",
+      "value": "https://prhppuuwcnmfdhwsagug.supabase.co",
+      "target": [
+        "production",
+        "preview",
+        "development"
+      ]
+    },
+    {
+      "key": "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+      "value": "{{SUPABASE_ANON_KEY}}",
+      "target": [
+        "production",
+        "preview",
+        "development"
+      ]
+    },
+    {
+      "key": "SUPABASE_SERVICE_ROLE_KEY",
+      "value": "{{SUPABASE_SERVICE_ROLE_KEY}}",
+      "target": [
+        "production",
+        "preview",
+        "development"
+      ]
+    },
+    {
+      "key": "GITHUB_TOKEN",
+      "value": "{{GITHUB_TOKEN}}",
+      "target": [
+        "production",
+        "preview",
+        "development"
+      ]
+    },
+    {
+      "key": "BROWSERWORKER_SECRET",
+      "value": "{{BROWSERWORKER_SECRET}}",
+      "target": [
+        "production",
+        "preview",
+        "development"
+      ]
+    },
+    {
+      "key": "BROWSERWORKER_URL",
+      "value": "https://browserworker-j4homeh5w-strategic-minds-advisory.vercel.app",
+      "target": [
+        "production",
+        "preview",
+        "development"
+      ]
+    },
+    {
+      "key": "CHATGPT_BRIDGE_URL",
+      "value": "https://xtreme-ai-bridge.vercel.app",
+      "target": [
+        "production",
+        "preview",
+        "development"
+      ]
+    },
+    {
+      "key": "UACS_DRIVE_FOLDER_ID",
+      "value": "{{DRIVE_FOLDER_ID}}",
+      "target": [
+        "production",
+        "preview",
+        "development"
+      ]
+    }
+  ],
+  "gitRepository": {
+    "type": "github",
+    "org": "Strategic-Minds",
+    "repo": "{{REPO_NAME}}"
+  }
+}
