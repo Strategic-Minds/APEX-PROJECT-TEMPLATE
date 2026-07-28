@@ -1,44 +1,57 @@
-# APEX Bidirectional State Synchronization System
+# Bidirectional Sync Architecture
 
-This document details the architectural data highways that APEX uses to keep Google Drive, GitHub, Vercel, Supabase, and OpenAI in absolute sync.
+## Overview
+Every project maintains live sync across 5 systems.
+State is always consistent. No manual updates needed.
 
-## Sync Architecture Flow
-
+## Sync Flow
 ```
-                      ┌──────────────────────┐
-                      │  Google Drive Folder │
-                      │   (09-SYNC-STATE)    │
-                      └──────────▲───────────┘
-                                 │
-                   sync-state.py │ (Pull/Push)
-                                 │
-                      ┌──────────▼───────────┐
-                      │  GitHub Repository   │  Auto-deploy
-                      │ (template.config.json) ├──────────────┐
-                      └──────────▲───────────┘              │
-                                 │                          ▼
-                PR Gates         │                     ┌──────────┐
-           (faang-qa-gate.yml)   │                     │  Vercel  │
-                                 │                     │  Engine  │
-                      ┌──────────┴───────────┐         └────┬─────┘
-                      │  Developer / Agent   │              │ Environment
-                      │      Workspace       │              │ Variables
-                      └──────────────────────┘              ▼
-                                                       ┌──────────┐
-                                                       │ Supabase │
-                                                       │ Database │
-                                                       └──────────┘
+Drive 01-SPECS (approved mockups)
+  ↓ APEX reads
+GitHub push → Vercel auto-deploy
+  ↓ BrowserWorker validates
+Drive 04-QA-REPORTS (score + screenshots)
+Supabase uacs_qa_results (score history)
+
+ChatGPT generates brand
+  ↓ Saves to Drive 02-BRAND-CHATGPT
+  ↓ POSTs to /api/bridge
+APEX reads → GitHub push → build
+
+APEX builds code
+  ↓ GitHub push (main)
+  ↓ Vercel auto-deploys
+  ↓ Drive-sync.yml runs: writes github-sync.json to Drive 09-SYNC-STATE
+  ↓ BrowserWorker validates (via webhook or manual trigger)
+  ↓ Score written to Supabase + Drive 04-QA-REPORTS
+  ↓ If score >=90: APEX reports "ship it" to Jeremy via WhatsApp
 ```
 
-## Detailed Synchronization Pathways
+## State Files (always in sync)
+| Location | File | Updated |
+|----------|------|---------|
+| Drive 09-SYNC-STATE | SYNC_STATE.json | On every GitHub push |
+| GitHub | sync/last-sync.json | On every push |
+| Supabase | apex_sync_state | On every APEX action |
+| Supabase | apex_build_receipts | On every build phase |
+| Base44 | memory.md | Daily + on key decisions |
+| ChatGPT | boot sequence doc | On every session start |
 
-### 1. Google Drive <-> GitHub (Actions Integration)
-*   **Mechanism**: A Python agent script (`scripts/sync-state.py`) reads the master project JSON config (`template.config.json`) and exports state dumps directly to the client's `09-SYNC-STATE` folder on Google Drive.
-*   **Triggers**: On every Git push to the `main` branch, a GitHub Action (`drive-sync.yml`) wakes up, loads the `GOOGLEDRIVE_ACCESS_TOKEN`, and synchronizes state metrics.
+## GitHub Actions Workflows
+| Workflow | Trigger | Action |
+|----------|---------|--------|
+| drive-sync.yml | Push to main + daily | Writes sync state to Drive |
+| faang-qa-gate.yml | Push/PR | TypeScript + ESLint + build |
+| supabase-check.yml | Push to supabase/ | Verifies migrations exist |
+| vercel-deploy-monitor.yml | Push | Logs deploy info |
+| new-project-init.yml | Manual | Creates full project infra |
+| memory-sync.yml | Daily 9am EST | Syncs all project states |
+| browserworker-validate.yml | After deploy | Screenshots + visual diff |
 
-### 2. GitHub -> Vercel (CI/CD Deployment)
-*   **Mechanism**: Vercel integrates natively with the GitHub project. Every merge to `main` starts a production deployment immediately.
-*   **Post-Deploy validation**: Once the deploy finishes successfully, the `browserworker-validate.yml` workflow fires off a signal to **BrowserWorker** to capture visual UI screenshots, ensuring zero design-system drift.
-
-### 3. Vercel <-> Supabase (State Bridge)
-*   **Mechanism**: Serverless APIs inside Next.js use credentials defined in Vercel's environment variables to securely execute mutations or read data from the Supabase instance.
+## ChatGPT → APEX Bridge
+ChatGPT POSTs to: https://universal-autonomous-coding-system-dlma2kyqn.vercel.app/api/bridge
+```json
+{"from":"chatgpt","to":"apex","type":"update","project":"PROJECT_NAME",
+ "payload":{"action":"brand_complete","result":"logos+mockups in Drive 02-BRAND-CHATGPT","next_needed":"build"}}
+```
+APEX reads bridge on every session start, processes pending updates, continues pipeline.
