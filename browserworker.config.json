@@ -1,0 +1,51 @@
+{
+  "version": "1.0",
+  "description": "BrowserWorker validation config for APEX projects",
+  "browserworker_url": "https://browserworker-j4homeh5w-strategic-minds-advisory.vercel.app",
+  "validation_rules": {
+    "min_score": 90,
+    "require_screenshot": true,
+    "check_routes": true,
+    "visual_diff": true,
+    "source_truth_folder": "01-SPECS"
+  },
+  "routes_to_validate": "{{ROUTES_LIST}}",
+  "faang_dimensions": {
+    "code_quality": {
+      "weight": 25,
+      "checks": [
+        "typescript",
+        "eslint",
+        "no_console_log",
+        "no_hardcoded_secrets"
+      ]
+    },
+    "visual_parity": {
+      "weight": 25,
+      "checks": [
+        "screenshot_vs_mockup",
+        "color_palette",
+        "layout_structure",
+        "font_sizes"
+      ]
+    },
+    "functional": {
+      "weight": 25,
+      "checks": [
+        "all_routes_200",
+        "api_endpoints",
+        "forms_working",
+        "no_broken_links"
+      ]
+    },
+    "performance": {
+      "weight": 25,
+      "checks": [
+        "pagespeed_85",
+        "a11y_95",
+        "seo_95",
+        "cls_under_0_1"
+      ]
+    }
+  }
+}
