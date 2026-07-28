@@ -1,0 +1,36 @@
+name: FAANG QA Gate
+
+on:
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  verify:
+    name: FAANG-Grade QA Quality Gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - name: Install Workspace Dependencies
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
+
+      - name: Lint and Format Audit
+        run: npm run lint
+
+      - name: Strict Type Checks
+        run: npm run typecheck
+
+      - name: Production Build Verification
+        run: npm run build
